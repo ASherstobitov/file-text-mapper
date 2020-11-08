@@ -1,11 +1,13 @@
 package com.fileread.service.impl;
 
 import com.fileread.configuration.FileStorageProperties;
+import com.fileread.service.DBFileStorageService;
 import com.fileread.service.FileStorageService;
 import com.fileread.service.handler.FileHandler;
 import com.fileread.service.handler.FileTransfer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,17 +25,29 @@ public class FileStorageServiceImpl implements FileStorageService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageServiceImpl.class);
 
+    @Autowired
+    private DBFileStorageService dbFileStorageService;
+
+
+
     private final Path fileStorageLocation;
     private final FileTransfer fileTransfer;
     private final FileHandler fileHandler;
 
-    public FileStorageServiceImpl(FileStorageProperties fileStorageProperties, FileTransfer fileTransfer, FileHandler fileHandler) {
+    public FileStorageServiceImpl(FileStorageProperties fileStorageProperties,
+                                  FileTransfer fileTransfer, FileHandler fileHandler) {
         this.fileStorageLocation = Paths.get(fileStorageProperties.getUploadDir()).toAbsolutePath().normalize();
         this.fileTransfer = fileTransfer;
         this.fileHandler = fileHandler;
     }
 
     public NavigableMap<String, String> getTOCFromFIle(MultipartFile multipartFile) {
+
+//        try {
+//            dbFileStorageService.store(multipartFile);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
@@ -42,7 +56,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 
         LOGGER.info("from txt file");
         NavigableMap<String, String> map = fileHandler.getTOCFromFile(multipartFile);
-
         fileTransfer.transferFile(multipartFile);
         fileHandler.createWordDoc();
 

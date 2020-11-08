@@ -15,13 +15,15 @@ public class FileController {
         this.fileStorageService = fileStorageService;
     }
 
-    @GetMapping("/uploadFile")
-    public NavigableMap<String, String> getTOCFromFIle(@RequestParam("file") MultipartFile file) {
+//    get the file
+    @PostMapping("/uploadFile")
+    public NavigableMap<String, String> getTOCFromFIle(MultipartFile file) {
         return fileStorageService.getTOCFromFIle(file);
     }
 
     @GetMapping("/number")
     public String getPhoneNumber(@RequestParam(name = "id", required = false) String id) {
+
         return id;
     }
 }
